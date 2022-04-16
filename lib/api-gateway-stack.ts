@@ -70,9 +70,12 @@ export class APIGatewayStack extends Stack {
       deployOptions: {
         stageName: "dev",
       },
+      // 【重要】バイナリメディアタイプの指定
+      binaryMediaTypes: ["application/zip", "image/png"],
     });
     api.root
       .addResource("get-single-object")
+      .addResource("{key}")
       .addMethod("GET", new LambdaIntegration(getSingleObjectFunction));
     api.root
       .addResource("get-selected-objects")
