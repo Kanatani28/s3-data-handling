@@ -39,7 +39,7 @@ def get_single_object(key):
 
 # @app.route("/get_selected_objects")
 # def get_selected_objects():
-#   target_keys = request.args.getlist('target_keys')
+#   target_keys = request.args.getlist('target_key')
 #   return f"<h1>Hello, Flask!2 {target_keys[0]} {target_keys[1]}</h1>"
 
 # @app.route("/get_objects_by_prefix")
