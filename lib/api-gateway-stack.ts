@@ -9,9 +9,12 @@ export class APIGatewayStack extends Stack {
   constructor(scope: Construct, id: string, props?: StackProps) {
     super(scope, id, props);
 
+    const env = this.node.tryGetContext("env");
+    const BUCKET_NAME = this.node.tryGetContext(env).environment.BUCKET_NAME;
+
     // Lambdaの定義
     const LAMBDA_FUNCTION_DIR = path.join(__dirname, "../app/lambda");
-    
+
     const getSingleObjectFunction = new Function(
       this,
       "GetSingleObjectFunction",
@@ -21,6 +24,9 @@ export class APIGatewayStack extends Stack {
         runtime: Runtime.PYTHON_3_9,
         // ファイルの大きさによっては時間がかかるのでタイムアウト値を調整
         timeout: Duration.seconds(30),
+        environment: {
+          BUCKET_NAME,
+        },
       }
     );
     getSingleObjectFunction.role?.addManagedPolicy(
@@ -36,6 +42,9 @@ export class APIGatewayStack extends Stack {
         runtime: Runtime.PYTHON_3_9,
         // ファイルの大きさによっては時間がかかるのでタイムアウト値を調整
         timeout: Duration.seconds(30),
+        environment: {
+          BUCKET_NAME,
+        },
       }
     );
     getSelectedObjectsFunction.role?.addManagedPolicy(
@@ -51,6 +60,9 @@ export class APIGatewayStack extends Stack {
         runtime: Runtime.PYTHON_3_9,
         // ファイルの大きさによっては時間がかかるのでタイムアウト値を調整
         timeout: Duration.seconds(30),
+        environment: {
+          BUCKET_NAME,
+        },
       }
     );
     getObjectsByPrefixFunction.role?.addManagedPolicy(
@@ -68,7 +80,7 @@ export class APIGatewayStack extends Stack {
       },
       // デプロイする環境 状況に応じて適宜変える
       deployOptions: {
-        stageName: "dev",
+        stageName: env,
       },
       // 【重要】バイナリメディアタイプの指定
       binaryMediaTypes: ["application/zip", "image/png"],
@@ -79,9 +91,9 @@ export class APIGatewayStack extends Stack {
       .addMethod("GET", new LambdaIntegration(getSingleObjectFunction));
     api.root
       .addResource("get-selected-objects")
-      .addMethod("GET", new LambdaIntegration(getSingleObjectFunction));
+      .addMethod("GET", new LambdaIntegration(getSelectedObjectsFunction));
     api.root
       .addResource("get-objects-by-prefix")
-      .addMethod("GET", new LambdaIntegration(getSingleObjectFunction));
+      .addMethod("GET", new LambdaIntegration(getObjectsByPrefixFunction));
   }
 }

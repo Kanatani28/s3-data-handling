@@ -20,14 +20,12 @@ def handler(event, context):
     with zipfile.ZipFile(zip_path, "w", compression=zipfile.ZIP_DEFLATED) as new_zip:
         for summary in object_summaries:
             if summary.key.endswith(".png"):
-                # ファイル名を取り出す folder/data1.pdf
-                filename = summary.key.split("/")[1]
                 # S3オブジェクトを取得する
                 s3_object = summary.get()
                 # バイナリデータ部分取得
                 body = s3_object["Body"].read()
 
-                new_zip.writestr(filename, body)
+                new_zip.writestr(summary.key, body)
                 
     # 作成したzipをレスポンスとして返す処理
     with open(zip_path, "rb") as zip_data:

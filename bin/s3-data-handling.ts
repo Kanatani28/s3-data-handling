@@ -2,8 +2,13 @@
 import 'source-map-support/register';
 import * as cdk from 'aws-cdk-lib';
 import { APIGatewayStack } from '../lib/api-gateway-stack'
+import * as cdkJson from '../cdk.json';
 
-const app = new cdk.App();
+const app = new cdk.App({
+  // package.jsonで指定されているバージョンをcontextに設定する
+  // 実行例 npm run cdk -- deploy --context env=dev
+  context: cdkJson.context,
+});
 new APIGatewayStack(app, 'APIGatewayStack', {
   /* If you don't specify 'env', this stack will be environment-agnostic.
    * Account/Region-dependent features and context lookups will not work,
